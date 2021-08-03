@@ -1,9 +1,47 @@
 import math
+import requests
+import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.conf import settings
+
 from .models import Newsletter
 from .serializers import NewsletterSerializer
+
+MAIL_CHIMP_API_KEY = settings.MAIL_CHIMP_API_KEY
+MAIL_CHIMP_DATA_CENTER = settings.MAIL_CHIMP_DATA_CENTER
+MAIL_CHIMP_EMAIL_LIST_ID = settings.MAIL_CHIMP_EMAIL_LIST_ID
+
+api_url = f'https://{MAIL_CHIMP_DATA_CENTER}.api.mailchimp.com/3.0/'
+
+members_endpoint = f'{api_url}/lists/{MAIL_CHIMP_EMAIL_LIST_ID}/members'
+
+
+def subscribe_email(email,first_name):
+    """[Adds email to subscriber list in mailchimp]
+
+    Args:
+        email ([str]): [email of user]
+        first_name ([str]): [name of user]
+
+    Returns:
+        [JSON]: [returns response from mailchimp api ]
+    """
+    data = {
+        'email_address': email,
+        'status': 'subscribed',
+        'full_name': first_name,
+        }
+    r = requests.post(
+        members_endpoint,
+        auth = ("", MAIL_CHIMP_API_KEY),
+        data = json.dumps(data),
+        
+    )
+    
+    return r.status_code, r.json()
 
 
 class LetterSignUpView(APIView):
@@ -23,7 +61,6 @@ class LetterSignUpView(APIView):
             [JSON]: [response from endpoint]
         """
         data = self.request.data  
-        print(data)
         first_name = data['first_name']
         email = data['email']
         agree = data['agree']
@@ -41,12 +78,20 @@ class LetterSignUpView(APIView):
                     {'error': 'Please agree to Privacy Policy and Terms of Service'},
                     status= status.HTTP_400_BAD_REQUEST
                 )
-                
-            Newsletter.objects.create(firstname=first_name, email=email,agree=agree) 
-            return Response(
-                {'Success': 'Contact added successfully to newsletter list'},
-                status= status.HTTP_200_OK
-            )
+            user_signed_up_already = Newsletter.objects.filter(firstname=first_name)
+            if user_signed_up_already:
+                 return Response(
+                    {'Success': 'You have already signed up for newsletter list'},
+                    status= status.HTTP_200_OK
+                )
+            else: 
+                Newsletter.objects.create(firstname=first_name, email=email,agree=agree)
+                # adding to subscriber list in mailchimp
+                mail_sent = subscribe_email(email,first_name)
+                return Response(
+                    {'Success': 'Contact added successfully to newsletter list'},
+                    status= status.HTTP_200_OK
+                )
         except Exception as e:
             return Response(
                 {'error': f"{e}"},
