@@ -39,11 +39,16 @@ const App = () => {
                     body,
                     config
                 ).then(function(response) {
-                    console.log(response.data);
+                    // console.log(response.data);
                 });
             } catch(err) {
 
             }
+            setFormData({
+                first_name: '',
+                email: '',
+            });
+            setAgree(false);    
             setLoading(false);
         };
 
