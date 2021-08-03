@@ -125,6 +125,6 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
 ]
 
-MAIL_CHIMP_API_KEY = '881b9e5dd68e44d3532693353c871352-us6'
-MAIL_CHIMP_DATA_CENTER = 'us6'
-MAIL_CHIMP_EMAIL_LIST_ID = '41d09bcd64'
+MAIL_CHIMP_API_KEY = '*******************************'
+MAIL_CHIMP_DATA_CENTER = '***'
+MAIL_CHIMP_EMAIL_LIST_ID = '**************'
