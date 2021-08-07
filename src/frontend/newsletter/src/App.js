@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Loader from 'react-loader-spinner';
 
 const App = () => {
     const [loading, setLoading] = useState(false);
+    const [signupdata, setSignupdata] = useState({
+        status: '',
+    })
     const [agree, setAgree] = useState(false);
     const [formData, setFormData] = useState({
         first_name: '',
         email: '',
     });
+    useEffect (
+        () => {
+            console.log(signupdata)
+        }, [signupdata]
+    ) 
 
     const { first_name, email } = formData;
 
@@ -39,7 +47,7 @@ const App = () => {
                     body,
                     config
                 ).then(function(response) {
-                    // console.log(response.data);
+                    setSignupdata({status: response.data})
                 });
             } catch(err) {
 
@@ -51,9 +59,11 @@ const App = () => {
             setAgree(false);    
             setLoading(false);
         };
-
+        
         fetchData();
+        
     }
+    
 
     return (
         <div className='mt-5 d-flex flex-column justify-content-center align-items-center'>
@@ -110,9 +120,9 @@ const App = () => {
                                 color='#00BFFF' 
                                 height={50} 
                                 width={50} 
-                                timeout={3000}
                             />
                         </div>
+                        
                     ) : (
                         <button className='btn btn-success btn-lg'>
                             Sign Up
