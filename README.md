@@ -1,3 +1,5 @@
+![alt text](https://github.com/Raja-mishra1/django_newsletters/blob/master/src/Screenshot%20from%202021-08-07%2009-56-14.png)
+
 # Django Newsletter
 
 Django newsletter is a webapp to let users subscribe for emails powered by Django and react 
